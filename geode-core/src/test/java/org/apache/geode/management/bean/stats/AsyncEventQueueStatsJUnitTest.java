@@ -60,6 +60,7 @@ public class AsyncEventQueueStatsJUnitTest extends MBeanStatsTestCase {
     StatisticDescriptor[] sds = asyncEventQueueStats.type.getStatistics();
     int notQueueEvents = 0;
     int notQueueToPrimary = 0;
+    int eventProcessedByQueueRemovalMessage = 0;
     for (StatisticDescriptor s : sds) {
       if (s.getName().equals("notQueuedEvent")) {
         notQueueEvents++;
@@ -67,9 +68,13 @@ public class AsyncEventQueueStatsJUnitTest extends MBeanStatsTestCase {
       if (s.getName().equals("notQueuedEventAtYetRunningPrimarySender")) {
         notQueueToPrimary++;
       }
+      if (s.getName().equals("eventProcessedByQueueRemovalMessage")) {
+        eventProcessedByQueueRemovalMessage++;
+      }
     }
     assertEquals(1, notQueueEvents);
     assertEquals(1, notQueueToPrimary);
+    assertEquals(1, eventProcessedByQueueRemovalMessage);
   }
 
 }

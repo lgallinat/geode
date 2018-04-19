@@ -205,6 +205,7 @@ public class ParallelWANConflationDUnitTest extends WANTestBase {
     vm4.invoke(() -> checkQueueSize("ln", 0));
     verifyEventSecondaryQueuesDrained("ln");
     validateEventSecondaryQueueSize(0, redundancy);
+    validateEventProcessedByQueueRemovalMessage(expectedEventNumAfterConflation, redundancy);
   }
 
   private void validateEventSecondaryQueueSize(int expectedNum, int redundancy) {
@@ -216,8 +217,22 @@ public class ParallelWANConflationDUnitTest extends WANTestBase {
         (ArrayList<Integer>) vm6.invoke(() -> WANTestBase.getSenderStats("ln", expectedNum));
     ArrayList<Integer> v7List =
         (ArrayList<Integer>) vm7.invoke(() -> WANTestBase.getSenderStats("ln", expectedNum));
-    assertTrue("Event in secondary queue should be 100",
+    assertTrue("Event in secondary queue should be " + (expectedNum * redundancy),
         (v4List.get(10) + v5List.get(10) + v6List.get(10) + v7List.get(10)) == expectedNum
+            * redundancy);
+  }
+
+  private void validateEventProcessedByQueueRemovalMessage(int expectedNum, int redundancy) {
+    ArrayList<Integer> v4List =
+        (ArrayList<Integer>) vm4.invoke(() -> WANTestBase.getSenderStats("ln", expectedNum));
+    ArrayList<Integer> v5List =
+        (ArrayList<Integer>) vm5.invoke(() -> WANTestBase.getSenderStats("ln", expectedNum));
+    ArrayList<Integer> v6List =
+        (ArrayList<Integer>) vm6.invoke(() -> WANTestBase.getSenderStats("ln", expectedNum));
+    ArrayList<Integer> v7List =
+        (ArrayList<Integer>) vm7.invoke(() -> WANTestBase.getSenderStats("ln", expectedNum));
+    assertTrue("Event processed by queue removal message should be " + (expectedNum * redundancy),
+        (v4List.get(11) + v5List.get(11) + v6List.get(11) + v7List.get(11)) == expectedNum
             * redundancy);
   }
 

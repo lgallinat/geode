@@ -236,6 +236,10 @@ public abstract class AbstractBucketRegionQueue extends BucketRegion {
     this.gatewaySenderStats.incSecondaryQueueSize(size);
   }
 
+  public void incEventProcessedByQueueRemovalMessage(int size) {
+    this.gatewaySenderStats.incEventProcessedByQueueRemovalMessage(size);
+  }
+
   public void incQueueSize() {
     this.gatewaySenderStats.incQueueSize();
   }

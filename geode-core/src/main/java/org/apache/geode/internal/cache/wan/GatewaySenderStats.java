@@ -48,6 +48,9 @@ public class GatewaySenderStats {
   protected static final String EVENT_QUEUE_SIZE = "eventQueueSize";
   /** Name of the event secondary queue size statistic */
   protected static final String EVENT_SECONDARY_QUEUE_SIZE = "eventSecondaryQueueSize";
+  /** Total number of events processed by queue removal message statistic */
+  protected static final String EVENT_PROCESSED_BY_QUEUE_REMOVAL_MESSAGE =
+      "eventProcessedByQueueRemovalMessage";
   /** Name of the event temporary queue size statistic */
   protected static final String TMP_EVENT_QUEUE_SIZE = "tempQueueSize";
   /** Name of the events distributed statistic */
@@ -108,6 +111,8 @@ public class GatewaySenderStats {
   protected static int eventQueueSizeId;
   /** Id of the event in secondary queue size statistic */
   protected static int eventSecondaryQueueSizeId;
+  /** Id of the event processed by queue removal message statistic */
+  protected static int eventProcessedByQueueRemovalMessageId;
   /** Id of the temp event queue size statistic */
   protected static int eventTmpQueueSizeId;
   /** Id of the events distributed statistic */
@@ -174,6 +179,8 @@ public class GatewaySenderStats {
             f.createIntGauge(EVENT_QUEUE_SIZE, "Size of the event queue.", "operations", false),
             f.createIntGauge(EVENT_SECONDARY_QUEUE_SIZE, "Size of secondary event queue.",
                 "operations", false),
+            f.createIntGauge(EVENT_PROCESSED_BY_QUEUE_REMOVAL_MESSAGE,
+                "Total number of events processed by queue removal message.", "operations", false),
             f.createIntGauge(TMP_EVENT_QUEUE_SIZE, "Size of the temporary events.", "operations",
                 false),
             f.createIntCounter(EVENTS_NOT_QUEUED_CONFLATED,
@@ -245,6 +252,7 @@ public class GatewaySenderStats {
     eventQueueTimeId = type.nameToId(EVENT_QUEUE_TIME);
     eventQueueSizeId = type.nameToId(EVENT_QUEUE_SIZE);
     eventSecondaryQueueSizeId = type.nameToId(EVENT_SECONDARY_QUEUE_SIZE);
+    eventProcessedByQueueRemovalMessageId = type.nameToId(EVENT_PROCESSED_BY_QUEUE_REMOVAL_MESSAGE);
     eventTmpQueueSizeId = type.nameToId(TMP_EVENT_QUEUE_SIZE);
     eventsDistributedId = type.nameToId(EVENTS_DISTRIBUTED);
     eventsExceedingAlertThresholdId = type.nameToId(EVENTS_EXCEEDING_ALERT_THRESHOLD);
@@ -374,6 +382,15 @@ public class GatewaySenderStats {
   }
 
   /**
+   * Returns the current value of the "eventProcessedByQueueRemovalMessage" stat.
+   *
+   * @return the current value of the "eventProcessedByQueueRemovalMessage" stat
+   */
+  public int getEventProcessedByQueueRemovalMessage() {
+    return this.stats.getInt(eventProcessedByQueueRemovalMessageId);
+  }
+
+  /**
    * Returns the current value of the "tempQueueSize" stat.
    *
    * @return the current value of the "tempQueueSize" stat.
@@ -487,6 +504,15 @@ public class GatewaySenderStats {
   }
 
   /**
+   * Sets the "eventProcessedByQueueRemovalMessage" stat.
+   *
+   * @param size The total number of the events processed by queue removal message
+   */
+  public void setEventProcessedByQueueRemovalMessage(int size) {
+    this.stats.setInt(eventProcessedByQueueRemovalMessageId, size);
+  }
+
+  /**
    * Sets the "tempQueueSize" stat.
    *
    * @param size The size of the temp queue
@@ -508,7 +534,6 @@ public class GatewaySenderStats {
    */
   public void incSecondaryQueueSize() {
     this.stats.incInt(eventSecondaryQueueSizeId, 1);
-    assert this.stats.getInt(eventSecondaryQueueSizeId) >= 0;
   }
 
   /**
@@ -534,7 +559,15 @@ public class GatewaySenderStats {
    */
   public void incSecondaryQueueSize(int delta) {
     this.stats.incInt(eventSecondaryQueueSizeId, delta);
-    assert this.stats.getInt(eventSecondaryQueueSizeId) >= 0;
+  }
+
+  /**
+   * Increments the "eventProcessedByQueueRemovalMessage" stat by given delta.
+   *
+   * @param delta an integer by which events are processed by queue removal message
+   */
+  public void incEventProcessedByQueueRemovalMessage(int delta) {
+    this.stats.incInt(eventProcessedByQueueRemovalMessageId, delta);
   }
 
   /**

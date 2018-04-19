@@ -1202,6 +1202,7 @@ public class WANTestBase extends DistributedTestCase {
     stats.add(statistics.getEventsConflatedFromBatches());
     stats.add(statistics.getConflationIndexesMapSize());
     stats.add(statistics.getEventSecondaryQueueSize());
+    stats.add(statistics.getEventProcessedByQueueRemovalMessage());
     return stats;
   }
 

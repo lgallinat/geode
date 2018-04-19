@@ -52,16 +52,19 @@ public class SerialAsyncEventQueueImplJUnitTest {
     queue.getStatistics().incQueueSize(5);
     queue.getStatistics().incSecondaryQueueSize(6);
     queue.getStatistics().incTempQueueSize(10);
+    queue.getStatistics().incEventProcessedByQueueRemovalMessage(3);
 
     assertEquals(5, queue.getStatistics().getEventQueueSize());
     assertEquals(6, queue.getStatistics().getEventSecondaryQueueSize());
     assertEquals(10, queue.getStatistics().getTempEventQueueSize());
+    assertEquals(3, queue.getStatistics().getEventProcessedByQueueRemovalMessage());
 
     queue.stop();
 
     assertEquals(0, queue.getStatistics().getEventQueueSize());
     assertEquals(0, queue.getStatistics().getEventSecondaryQueueSize());
     assertEquals(0, queue.getStatistics().getTempEventQueueSize());
+    assertEquals(0, queue.getStatistics().getEventProcessedByQueueRemovalMessage());
   }
 
 }

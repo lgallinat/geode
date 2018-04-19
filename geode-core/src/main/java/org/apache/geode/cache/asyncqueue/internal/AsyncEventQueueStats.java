@@ -44,6 +44,8 @@ public class AsyncEventQueueStats extends GatewaySenderStats {
             f.createIntGauge(EVENT_QUEUE_SIZE, "Size of the event queue.", "operations", false),
             f.createIntGauge(EVENT_SECONDARY_QUEUE_SIZE, "Size of the secondary event queue.",
                 "operations", false),
+            f.createIntGauge(EVENT_PROCESSED_BY_QUEUE_REMOVAL_MESSAGE,
+                "Total number of events processed by queue removal message.", "operations", false),
             f.createIntGauge(TMP_EVENT_QUEUE_SIZE, "Size of the temporary events queue.",
                 "operations", false),
             f.createIntCounter(EVENTS_NOT_QUEUED_CONFLATED,
@@ -111,6 +113,7 @@ public class AsyncEventQueueStats extends GatewaySenderStats {
     eventQueueTimeId = type.nameToId(EVENT_QUEUE_TIME);
     eventQueueSizeId = type.nameToId(EVENT_QUEUE_SIZE);
     eventSecondaryQueueSizeId = type.nameToId(EVENT_SECONDARY_QUEUE_SIZE);
+    eventProcessedByQueueRemovalMessageId = type.nameToId(EVENT_PROCESSED_BY_QUEUE_REMOVAL_MESSAGE);
     eventTmpQueueSizeId = type.nameToId(TMP_EVENT_QUEUE_SIZE);
     eventsDistributedId = type.nameToId(EVENTS_DISTRIBUTED);
     eventsExceedingAlertThresholdId = type.nameToId(EVENTS_EXCEEDING_ALERT_THRESHOLD);

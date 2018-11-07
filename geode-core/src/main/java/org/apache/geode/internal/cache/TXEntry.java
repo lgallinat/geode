@@ -94,7 +94,24 @@ public class TXEntry implements Region.Entry {
     // this.rememberReads);
     @Unretained
     Object value = this.myTX.getDeserializedValue(keyInfo, this.localRegion, false, false, false,
-        null, false, false);
+        null, false, false, true);
+    if (value == null) {
+      throw new EntryDestroyedException(this.keyInfo.getKey().toString());
+    } else if (Token.isInvalid(value)) {
+      return null;
+    }
+
+    return value;
+  }
+
+  @Unretained
+  public Object getValue(boolean allowTombstone) {
+    checkTX();
+    // Object value = this.localRegion.getDeserialized(this.key, false, this.myTX,
+    // this.rememberReads);
+    @Unretained
+    Object value = this.myTX.getDeserializedValue(keyInfo, this.localRegion, false, false, false,
+        null, false, false, allowTombstone);
     if (value == null) {
       throw new EntryDestroyedException(this.keyInfo.getKey().toString());
     } else if (Token.isInvalid(value)) {

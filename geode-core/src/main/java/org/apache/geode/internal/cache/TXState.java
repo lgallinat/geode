@@ -1517,7 +1517,9 @@ public class TXState implements TXStateInterface {
   public TXEntryState txReadEntry(KeyInfo keyInfo, LocalRegion localRegion, boolean rememberRead,
       boolean createIfAbsent) {
     localRegion.cache.getCancelCriterion().checkCancelInProgress(null);
-    return txReadEntry(keyInfo, localRegion, rememberRead, null, createIfAbsent);
+    TXEntryState txEntryState =
+        txReadEntry(keyInfo, localRegion, rememberRead, null, createIfAbsent);
+    return txEntryState;
   }
 
   /**
@@ -1587,8 +1589,11 @@ public class TXState implements TXStateInterface {
   @Override
   public Object getDeserializedValue(KeyInfo keyInfo, LocalRegion localRegion, boolean updateStats,
       boolean disableCopyOnRead, boolean preferCD, EntryEventImpl clientEvent,
-      boolean returnTombstones, boolean retainResult) {
-    TXEntryState tx = txReadEntry(keyInfo, localRegion, true, true/* create txEntry is absent */);
+      boolean returnTombstones, boolean retainResult, boolean createIfAbsent) {
+    TXEntryState tx = txReadEntry(keyInfo, localRegion, true, createIfAbsent/*
+                                                                             * create txEntry is
+                                                                             * absent
+                                                                             */);
     if (tx != null) {
       Object v = tx.getValue(keyInfo, localRegion, preferCD);
       if (!disableCopyOnRead) {
@@ -1740,17 +1745,21 @@ public class TXState implements TXStateInterface {
   }
 
   private boolean readEntryAndCheckIfDestroyed(KeyInfo keyInfo, LocalRegion localRegion,
-      boolean rememberReads) {
+      boolean rememberReads, boolean createIfAbsent) {
     TXEntryState tx =
-        txReadEntry(keyInfo, localRegion, rememberReads, true/* create txEntry is absent */);
+        txReadEntry(keyInfo, localRegion, rememberReads, createIfAbsent/*
+                                                                        * create txEntry is absent
+                                                                        */);
     if (tx != null) {
       if (!tx.existsLocally()) {
         // It was destroyed by the transaction so skip
         // this key and try the next one
         return true; // fix for bug 34583
       }
+      return false;
     }
-    return false;
+    // entry does not exist.
+    return true;
   }
 
   /*
@@ -1776,7 +1785,7 @@ public class TXState implements TXStateInterface {
         }
       }
     }
-    if (!readEntryAndCheckIfDestroyed(curr, currRgn, rememberReads)) {
+    if (!readEntryAndCheckIfDestroyed(curr, currRgn, rememberReads, false)) {
       // need to create KeyInfo since higher level iterator may reuse KeyInfo
       return new TXEntry(currRgn,
           new KeyInfo(curr.getKey(), curr.getCallbackArg(), curr.getBucketId()), proxy,
@@ -1796,7 +1805,7 @@ public class TXState implements TXStateInterface {
   public Object getKeyForIterator(KeyInfo curr, LocalRegion currRgn, boolean rememberReads,
       boolean allowTombstones) {
     assert !(curr.getKey() instanceof RegionEntry);
-    if (!readEntryAndCheckIfDestroyed(curr, currRgn, rememberReads)) {
+    if (!readEntryAndCheckIfDestroyed(curr, currRgn, rememberReads, false)) {
       return curr.getKey();
     } else {
       return null;
